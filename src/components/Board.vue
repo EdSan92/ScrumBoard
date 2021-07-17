@@ -6,7 +6,6 @@
         :key="i"
         :showForm="showForm"
         :stickyId="stickyId"
-        class="card sticky"
         draggable="true"
         @drop="drop($event, sticky.id)"
         @dragover="allowDrop($event)"
@@ -15,7 +14,11 @@
         @deleteSticky="deleteSticky"
         @updateSticky="updateSticky"
     />
-    <div v-for="(groupedSticky, i) in groupedStickies" :key="i" class="card">
+    <div
+        v-for="(groupedSticky, i) in groupedStickies"
+        :key="i"
+        class="card grouped"
+    >
         <div
             v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
             :key="i"
@@ -136,8 +139,11 @@ export default defineComponent({
     width: 150px;
     min-height: 100px;
 }
-#draggable-container {
-    position: absolute;
-    z-index: 9;
+.grouped {
+    width: 200px;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>

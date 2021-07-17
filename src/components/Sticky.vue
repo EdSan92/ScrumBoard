@@ -36,7 +36,7 @@ export default defineComponent({
     showForm: Boolean,
     stickyId: {},
   },
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     let positions = {
       clientX: undefined,
       clientY: undefined,
@@ -97,5 +97,10 @@ export default defineComponent({
 .card {
     width: 100px;
     height: 100px;
+    display: flex;
+    align-items: center;
+}
+#draggable-container {
+    position: absolute;
 }
 </style>
