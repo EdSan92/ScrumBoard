@@ -1,10 +1,9 @@
 <template>
-    <div
-        ref="draggableContainer"
-        id="draggable-container"
-        @dragMouseDown="dragMouseDown"
-    >
-        <slot></slot>
+    <div ref="draggableContainer" id="draggable-container" class="card">
+        <div id="draggable-header" @mousedown="dragMouseDown">
+            <slot name="header"></slot>
+        </div>
+        <slot name="main"></slot>
     </div>
 </template>
 <script lang="ts">
@@ -20,10 +19,9 @@ export default defineComponent({
       movementY: 0,
     };
     let index: number;
-    const refsStickies = ref<HTMLElement[]>([]);
-    function dragMouseDown(event: any, i: number) {
+    const draggableContainer = ref<HTMLElement>();
+    function dragMouseDown(event: any) {
       event.preventDefault();
-      index = i;
       // get the mouse cursor position at startup:
       positions.clientX = event.clientX;
       positions.clientY = event.clientY;
@@ -37,21 +35,18 @@ export default defineComponent({
       positions.clientX = event.clientX;
       positions.clientY = event.clientY;
       // set the element's new position:
-      refsStickies.value[index].style.top =
-        refsStickies.value[index].offsetTop - positions.movementY + "px";
-      refsStickies.value[index].style.left =
-        refsStickies.value[index].offsetLeft - positions.movementX + "px";
+      draggableContainer.value!.style.top =
+        draggableContainer.value!.offsetTop - positions.movementY + "px";
+      draggableContainer.value!.style.left =
+        draggableContainer.value!.offsetLeft - positions.movementX + "px";
     }
     function closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
     }
-    onBeforeUpdate(() => {
-      refsStickies.value = [];
-    });
     return {
       dragMouseDown,
-      refsStickies,
+      draggableContainer,
     };
   },
 });

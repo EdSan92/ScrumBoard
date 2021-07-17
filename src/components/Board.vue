@@ -1,36 +1,41 @@
 <template>
     <button @click="createSticky" :disabled="showForm">New sticky</button>
-    <Draggable>
-        <Sticky
-            v-for="(sticky, i) in stickies.value"
-            :sticky="sticky"
-            :key="i"
-            :showForm="showForm"
-            :stickyId="stickyId"
-            draggable="true"
-            @drop="drop($event, sticky.id)"
-            @dragover="allowDrop($event)"
-            @dragstart="drag($event, sticky.id)"
-            @saveSticky="saveSticky"
-            @deleteSticky="deleteSticky"
-            @updateSticky="updateSticky"
-        />
-    </Draggable>
-    <div
-        v-for="(groupedSticky, i) in groupedStickies"
+    <Sticky
+        v-for="(sticky, i) in stickies.value"
+        :sticky="sticky"
         :key="i"
-        class="card grouped"
-    >
-        <div
-            v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
-            :key="i"
-            @drop="drop($event, groupedSticky.id)"
-            @dragover="allowDrop($event)"
-            class="card sticky"
-        >
-            {{ sticky.text }}
-        </div>
-    </div>
+        :showForm="showForm"
+        :stickyId="stickyId"
+        draggable="true"
+        @drop="drop($event, sticky.id)"
+        @dragover="allowDrop($event)"
+        @dragstart="drag($event, sticky.id)"
+        @saveSticky="saveSticky"
+        @deleteSticky="deleteSticky"
+        @updateSticky="updateSticky"
+    />
+    <Draggable v-if="groupedStickies.length > 0">
+        <template v-slot:header>
+            <button>Move</button>
+        </template>
+        <template v-slot:main>
+            <div
+                v-for="(groupedSticky, i) in groupedStickies"
+                :key="i"
+                class="card grouped"
+            >
+                <div
+                    v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
+                    :key="i"
+                    @drop="drop($event, groupedSticky.id)"
+                    @dragover="allowDrop($event)"
+                    class="card sticky"
+                >
+                    {{ sticky.text }}
+                </div>
+            </div>
+        </template>
+    </Draggable>
 </template>
 
 <script lang="ts">
