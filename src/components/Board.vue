@@ -22,7 +22,7 @@
             <div
                 v-for="(groupedSticky, i) in groupedStickies"
                 :key="i"
-                class="card grouped"
+                class="grouped"
             >
                 <div
                     v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"

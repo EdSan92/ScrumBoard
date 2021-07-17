@@ -4,25 +4,27 @@
             <button>Move</button>
         </template>
         <template v-slot:main>
-            <StickyForm
-                v-show="showForm && sticky.id === stickyId"
-                :id="sticky.id"
-                @saveSticky="saveSticky"
-            />
+            <div :style="`background-color: ${sticky.color}`">
+                <StickyForm
+                    v-show="showForm && sticky.id === stickyId"
+                    :id="sticky.id"
+                    @saveSticky="saveSticky"
+                />
 
-            <template v-if="!showForm || sticky.id !== stickyId">
-                <p>
-                    {{ sticky.text }}
-                </p>
-                <button @click="updateSticky(sticky.id)">Update</button>
-                <button @click="deleteSticky(sticky.id)">Delete</button>
-            </template>
+                <template v-if="!showForm || sticky.id !== stickyId">
+                    <p>
+                        {{ sticky.text }}
+                    </p>
+                    <button @click="updateSticky(sticky.id)">Update</button>
+                    <button @click="deleteSticky(sticky.id)">Delete</button>
+                </template>
+            </div>
         </template>
     </Draggable>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUpdate, ref } from "vue";
+import { defineComponent, onBeforeUpdate, onMounted, ref } from "vue";
 import StickyForm from "@/components/StickyForm.vue";
 import Draggable from "@/components/Draggable.vue";
 
@@ -35,6 +37,7 @@ export default defineComponent({
     stickyId: {},
   },
   setup(_, { emit }) {
+    const stickyDiv = ref<HTMLElement>();
     function saveSticky({ id, text, color }: any) {
       emit("saveSticky", { id, text, color });
     }

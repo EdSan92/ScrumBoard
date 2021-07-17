@@ -18,7 +18,6 @@ export default defineComponent({
       movementX: 0,
       movementY: 0,
     };
-    let index: number;
     const draggableContainer = ref<HTMLElement>();
     function dragMouseDown(event: any) {
       event.preventDefault();
