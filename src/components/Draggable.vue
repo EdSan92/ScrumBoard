@@ -1,43 +1,18 @@
 <template>
     <div
-        class="card"
-        :ref="
-            (el) => {
-                refsStickies[i] = el;
-            }
-        "
+        ref="draggableContainer"
         id="draggable-container"
+        @dragMouseDown="dragMouseDown"
     >
-        <StickyForm
-            v-show="showForm && sticky.id === stickyId"
-            :id="sticky.id"
-            @saveSticky="saveSticky"
-        />
-
-        <template v-if="!showForm || sticky.id !== stickyId">
-            <p>
-                {{ sticky.text }}
-            </p>
-            <button @mousedown="dragMouseDown($event, i)">Move</button>
-            <button @click="updateSticky(sticky.id)">Update</button>
-            <button @click="deleteSticky(sticky.id)">Delete</button>
-        </template>
+        <slot></slot>
     </div>
 </template>
-
 <script lang="ts">
 import { defineComponent, onBeforeUpdate, ref } from "vue";
-import StickyForm from "@/components/StickyForm.vue";
 
 export default defineComponent({
-  name: "Sticky",
-  components: { StickyForm },
-  props: {
-    sticky: {},
-    showForm: Boolean,
-    stickyId: {},
-  },
-  setup(_, { emit }) {
+  name: "Draggable",
+  setup() {
     let positions = {
       clientX: undefined,
       clientY: undefined,
@@ -46,15 +21,6 @@ export default defineComponent({
     };
     let index: number;
     const refsStickies = ref<HTMLElement[]>([]);
-    function saveSticky({ id, text, color }: any) {
-      emit("saveSticky", { id, text, color });
-    }
-    function deleteSticky(id: string) {
-      emit("deleteSticky", id);
-    }
-    function updateSticky(id: string) {
-      emit("updateSticky", id);
-    }
     function dragMouseDown(event: any, i: number) {
       event.preventDefault();
       index = i;
@@ -84,22 +50,15 @@ export default defineComponent({
       refsStickies.value = [];
     });
     return {
-      saveSticky,
-      updateSticky,
-      deleteSticky,
       dragMouseDown,
       refsStickies,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.card {
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    z-index: 10;
+<style>
+#draggable-container {
+    position: absolute;
+    z-index: 9;
 }
 </style>

@@ -1,19 +1,21 @@
 <template>
     <button @click="createSticky" :disabled="showForm">New sticky</button>
-    <Sticky
-        v-for="(sticky, i) in stickies.value"
-        :sticky="sticky"
-        :key="i"
-        :showForm="showForm"
-        :stickyId="stickyId"
-        draggable="true"
-        @drop="drop($event, sticky.id)"
-        @dragover="allowDrop($event)"
-        @dragstart="drag($event, sticky.id)"
-        @saveSticky="saveSticky"
-        @deleteSticky="deleteSticky"
-        @updateSticky="updateSticky"
-    />
+    <Draggable>
+        <Sticky
+            v-for="(sticky, i) in stickies.value"
+            :sticky="sticky"
+            :key="i"
+            :showForm="showForm"
+            :stickyId="stickyId"
+            draggable="true"
+            @drop="drop($event, sticky.id)"
+            @dragover="allowDrop($event)"
+            @dragstart="drag($event, sticky.id)"
+            @saveSticky="saveSticky"
+            @deleteSticky="deleteSticky"
+            @updateSticky="updateSticky"
+        />
+    </Draggable>
     <div
         v-for="(groupedSticky, i) in groupedStickies"
         :key="i"
@@ -36,10 +38,11 @@ import { defineComponent, reactive, ref } from "vue";
 import { uuid } from "vue-uuid";
 import { ISticky } from "@/interfaces/ISticky";
 import Sticky from "@/components/Sticky.vue";
+import Draggable from "@/components/Draggable.vue";
 
 export default defineComponent({
   name: "Board",
-  components: { Sticky },
+  components: { Sticky, Draggable },
   setup() {
     let stickies: { value: ISticky[] } = reactive({ value: [] });
     let groupedStickies: { id: string; stickies: ISticky[] }[] = reactive([]);

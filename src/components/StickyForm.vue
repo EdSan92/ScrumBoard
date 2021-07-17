@@ -39,11 +39,11 @@ export default defineComponent({
       type: String,
     },
   },
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     const text = ref("");
     const color = ref("#FFFFFF");
     function saveSticky(id: string) {
-      emit("foo", {
+      emit("saveSticky", {
         id: id,
         color: color.value,
         text: text.value,
