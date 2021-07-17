@@ -1,34 +1,20 @@
 <template>
     <button @click="createSticky" :disabled="showForm">New sticky</button>
-    <div
+    <Sticky
         v-for="(sticky, i) in stickies.value"
+        :sticky="sticky"
         :key="i"
+        :showForm="showForm"
+        :stickyId="stickyId"
         class="card sticky"
         draggable="true"
         @drop="drop($event, sticky.id)"
         @dragover="allowDrop($event)"
         @dragstart="drag($event, sticky.id)"
-        :ref="
-            (el) => {
-                refsStickies[i] = el;
-            }
-        "
-        id="draggable-container"
-    >
-        <StickyForm
-            v-show="showForm && sticky.id === stickyId"
-            :id="sticky.id"
-            @foo="saveSticky"
-        />
-        <template v-if="!showForm || sticky.id !== stickyId">
-            <p>
-                {{ sticky.text }}
-            </p>
-            <button @mousedown="dragMouseDown($event, i)">Move</button>
-            <button @click="updateSticky(sticky.id)">Update</button>
-            <button @click="deleteSticky(sticky.id)">Delete</button>
-        </template>
-    </div>
+        @saveSticky="saveSticky"
+        @deleteSticky="deleteSticky"
+        @updateSticky="updateSticky"
+    />
     <div v-for="(groupedSticky, i) in groupedStickies" :key="i" class="card">
         <div
             v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
@@ -43,27 +29,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUpdate, reactive, ref } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 import { uuid } from "vue-uuid";
 import { ISticky } from "@/interfaces/ISticky";
-import StickyForm from "@/components/StickyForm.vue";
+import Sticky from "@/components/Sticky.vue";
 
 export default defineComponent({
   name: "Board",
-  components: { StickyForm },
+  components: { Sticky },
   setup() {
     let stickies: { value: ISticky[] } = reactive({ value: [] });
     let groupedStickies: { id: string; stickies: ISticky[] }[] = reactive([]);
-    let positions = {
-      clientX: undefined,
-      clientY: undefined,
-      movementX: 0,
-      movementY: 0,
-    };
     let stickyId = ref();
     let showForm = ref();
-    let index: number;
-    const refsStickies = ref<HTMLElement[]>([]);
     function createSticky() {
       const id = uuid.v4();
       stickies.value.push({ id: id, text: "", color: "#FFFFFF", order: 0 });
@@ -132,36 +110,8 @@ export default defineComponent({
         );
       }
     }
-    onBeforeUpdate(() => {
-      refsStickies.value = [];
-    });
     function orderStickies(stickies: ISticky[]) {
       return stickies.sort((a, b) => b.order - a.order);
-    }
-    function dragMouseDown(event: any, i: number) {
-      event.preventDefault();
-      index = i;
-      // get the mouse cursor position at startup:
-      positions.clientX = event.clientX;
-      positions.clientY = event.clientY;
-      document.onmousemove = elementDrag;
-      document.onmouseup = closeDragElement;
-    }
-    function elementDrag(event: any) {
-      event.preventDefault();
-      positions.movementX = positions.clientX! - event.clientX;
-      positions.movementY = positions.clientY! - event.clientY;
-      positions.clientX = event.clientX;
-      positions.clientY = event.clientY;
-      // set the element's new position:
-      refsStickies.value[index].style.top =
-        refsStickies.value[index].offsetTop - positions.movementY + "px";
-      refsStickies.value[index].style.left =
-        refsStickies.value[index].offsetLeft - positions.movementX + "px";
-    }
-    function closeDragElement() {
-      document.onmouseup = null;
-      document.onmousemove = null;
     }
     return {
       stickies,
@@ -176,8 +126,6 @@ export default defineComponent({
       drop,
       groupedStickies,
       orderStickies,
-      dragMouseDown,
-      refsStickies,
     };
   },
 });
