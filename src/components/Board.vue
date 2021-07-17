@@ -32,6 +32,9 @@
                     class="card sticky"
                 >
                     {{ sticky.text }}
+                    <button @click="detachSticky(groupedSticky.id, sticky.id)">
+                        Detach
+                    </button>
                 </div>
             </div>
         </template>
@@ -139,6 +142,30 @@ export default defineComponent({
     function orderStickies(stickies: ISticky[]) {
       return stickies.sort((a, b) => b.order - a.order);
     }
+    function detachSticky(groupId: string, stickyId: string) {
+      stickies.value.push(
+        groupedStickies.value[
+          groupedStickies.value.findIndex((group) => group.id === groupId)
+        ].stickies.find((sticky) => sticky.id === stickyId)!
+      );
+      groupedStickies.value
+        .find((group) => group.id === groupId)
+        ?.stickies.splice(
+          groupedStickies.value
+            .find((group) => group.id === groupId)
+            ?.stickies.findIndex((sticky) => sticky.id === stickyId) || 0,
+          1
+        );
+      if (
+        groupedStickies.value.find((group) => group.id === groupId)?.stickies
+          .length === 0
+      ) {
+        groupedStickies.value.splice(
+          groupedStickies.value.findIndex((group) => group.id === groupId),
+          1
+        );
+      }
+    }
     return {
       stickies,
       createSticky,
@@ -152,6 +179,7 @@ export default defineComponent({
       drop,
       groupedStickies,
       orderStickies,
+      detachSticky,
     };
   },
 });
@@ -168,5 +196,6 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
 }
 </style>
