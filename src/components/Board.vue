@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { defineComponent, onMounted, reactive, ref, watch } from "vue";
 import { uuid } from "vue-uuid";
 import { ISticky } from "@/interfaces/ISticky";
 import Sticky from "@/components/Sticky.vue";
@@ -53,6 +53,12 @@ export default defineComponent({
     let groupedStickies: { id: string; stickies: ISticky[] }[] = reactive([]);
     let stickyId = ref();
     let showForm = ref();
+    watch(stickies, () => {
+      localStorage.setItem("stickies", JSON.stringify(stickies.value));
+    });
+    onMounted(() => {
+      stickies.value = JSON.parse(localStorage.getItem("stickies")!) || [];
+    });
     function createSticky() {
       const id = uuid.v4();
       stickies.value.push({ id: id, text: "", color: "#FFFFFF", order: 0 });
