@@ -40,7 +40,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const text = ref(undefined);
+    const text = ref("");
     const color = ref("#FFFFFF");
     function saveSticky(id: string) {
       emit("foo", {
