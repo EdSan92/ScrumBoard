@@ -1,5 +1,6 @@
 export interface ISticky {
+  id: string;
   text: string;
   color: string;
-  id: string
+  order: number
 };

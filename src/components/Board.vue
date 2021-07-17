@@ -1,7 +1,5 @@
 <template>
-    <button @click="createSticky" :disabled="mode === 'create'">
-        New sticky
-    </button>
+    <button @click="createSticky" :disabled="showForm">New sticky</button>
     <div
         v-for="(sticky, i) in stickies.value"
         :key="i"
@@ -12,30 +10,25 @@
         @dragstart="drag($event, sticky.id)"
     >
         <StickyForm
-            v-show="
-                (mode === 'create' || mode === 'update') &&
-                sticky.id === stickyId
-            "
+            v-show="showForm && sticky.id === stickyId"
             :id="sticky.id"
             @foo="saveSticky"
         />
-        <p v-if="mode === 'read' || sticky.id !== stickyId">
-            {{ sticky.text }}
-        </p>
-        <button v-if="mode === 'read'" @click="updateSticky(sticky.id)">
-            Update
-        </button>
-        <button v-if="mode === 'read'" @click="deleteSticky(sticky.id)">
-            Delete
-        </button>
+        <template v-if="!showForm || sticky.id !== stickyId">
+            <p>
+                {{ sticky.text }}
+            </p>
+            <button @click="updateSticky(sticky.id)">Update</button>
+            <button @click="deleteSticky(sticky.id)">Delete</button>
+        </template>
     </div>
-    {{ stickies }}
-    <div v-for="(groupedSticky, i) in groupedStickies" :key="i">
+    <div v-for="(groupedSticky, i) in groupedStickies" :key="i" class="card">
         <div
-            v-for="(sticky, i) in groupedSticky.stickies"
+            v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
             :key="i"
             @drop="drop($event, groupedSticky.id)"
             @dragover="allowDrop($event)"
+            class="card sticky"
         >
             {{ sticky.text }}
         </div>
@@ -55,32 +48,33 @@ export default defineComponent({
     let stickies: { value: ISticky[] } = reactive({ value: [] });
     let groupedStickies: { id: string; stickies: ISticky[] }[] = reactive([]);
     let stickyId = ref();
-    let mode = ref();
+    let showForm = ref();
     function createSticky() {
       const id = uuid.v4();
-      stickies.value.push({ id: id, text: "", color: "#FFFFFF" });
+      stickies.value.push({ id: id, text: "", color: "#FFFFFF", order: 0 });
       stickyId.value = id;
-      mode.value = "create";
+      showForm.value = true;
     }
     function saveSticky({ id, text, color }: any) {
       stickies.value[stickies.value.findIndex((sticky) => sticky.id === id)] = {
         id,
         text,
         color,
+        order: 0,
       };
       stickyId.value = null;
-      mode.value = "read";
+      showForm.value = false;
     }
     function updateSticky(id: string) {
       stickyId.value = id;
-      mode.value = "update";
+      showForm.value = true;
     }
     function deleteSticky(id: string) {
       stickies.value.splice(
         stickies.value.findIndex((sticky) => sticky.id === id),
         1
       );
-      mode.value = "read";
+      showForm.value = true;
     }
     function allowDrop(ev: DragEvent) {
       ev.preventDefault();
@@ -94,17 +88,39 @@ export default defineComponent({
       ev.preventDefault();
       let draggedStickyId = ev.dataTransfer!.getData("text");
       let droppedOnStickyId = id;
-      groupedStickies.push({
-        id: uuid.v4(),
-        stickies: stickies.value.filter(
-          (sticky) =>
-            sticky.id === draggedStickyId || sticky.id === droppedOnStickyId
-        ),
-      });
-      stickies.value = stickies.value.filter(
-        (sticky) =>
-          sticky.id !== draggedStickyId && sticky.id !== droppedOnStickyId
+      let draggedSticky = stickies.value.findIndex(
+        (sticky) => sticky.id === draggedStickyId
       );
+      let droppedOnSticky = stickies.value.findIndex(
+        (sticky) => sticky.id === droppedOnStickyId
+      );
+      if (groupedStickies.find((sticky) => sticky.id === id)) {
+        groupedStickies
+          .find((sticky) => sticky.id === id)
+          ?.stickies.push(
+            stickies.value.find((sticky) => sticky.id === draggedStickyId)!
+          );
+        stickies.value = stickies.value.filter(
+          (sticky) => sticky.id !== draggedStickyId
+        );
+      } else {
+        stickies.value[draggedSticky].order = 1;
+        stickies.value[droppedOnSticky].order = 2;
+        groupedStickies.push({
+          id: uuid.v4(),
+          stickies: [
+            stickies.value[draggedSticky],
+            stickies.value[droppedOnSticky],
+          ],
+        });
+        stickies.value = stickies.value.filter(
+          (sticky) =>
+            sticky.id !== draggedStickyId && sticky.id !== droppedOnStickyId
+        );
+      }
+    }
+    function orderStickies(stickies: ISticky[]) {
+      return stickies.sort((a, b) => b.order - a.order);
     }
     return {
       stickies,
@@ -112,12 +128,13 @@ export default defineComponent({
       saveSticky,
       updateSticky,
       deleteSticky,
-      mode,
+      showForm,
       stickyId,
       allowDrop,
       drag,
       drop,
       groupedStickies,
+      orderStickies,
     };
   },
 });
@@ -125,7 +142,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .sticky {
-    width: 250px;
-    height: 250;
+    width: 150px;
+    min-height: 100px;
 }
 </style>
