@@ -14,13 +14,13 @@
         @deleteSticky="deleteSticky"
         @updateSticky="updateSticky"
     />
-    <Draggable v-if="groupedStickies.length > 0">
+    <Draggable v-if="groupedStickies.value.length > 0">
         <template v-slot:header>
             <button>Move</button>
         </template>
         <template v-slot:main>
             <div
-                v-for="(groupedSticky, i) in groupedStickies"
+                v-for="(groupedSticky, i) in groupedStickies.value"
                 :key="i"
                 class="grouped"
             >
@@ -50,14 +50,23 @@ export default defineComponent({
   components: { Sticky, Draggable },
   setup() {
     let stickies: { value: ISticky[] } = reactive({ value: [] });
-    let groupedStickies: { id: string; stickies: ISticky[] }[] = reactive([]);
+    let groupedStickies: { value: { id: string; stickies: ISticky[] }[] } =
+      reactive({ value: [] });
     let stickyId = ref();
     let showForm = ref();
     watch(stickies, () => {
       localStorage.setItem("stickies", JSON.stringify(stickies.value));
     });
+    watch(groupedStickies, () => {
+      localStorage.setItem(
+        "groupedStickies",
+        JSON.stringify(groupedStickies.value)
+      );
+    });
     onMounted(() => {
       stickies.value = JSON.parse(localStorage.getItem("stickies")!) || [];
+      groupedStickies.value =
+        JSON.parse(localStorage.getItem("groupedStickies")!) || [];
     });
     function createSticky() {
       const id = uuid.v4();
@@ -102,8 +111,8 @@ export default defineComponent({
       let droppedOnSticky = stickies.value.findIndex(
         (sticky) => sticky.id === droppedOnStickyId
       );
-      if (groupedStickies.find((sticky) => sticky.id === id)) {
-        groupedStickies
+      if (groupedStickies.value.find((sticky) => sticky.id === id)) {
+        groupedStickies.value
           .find((sticky) => sticky.id === id)
           ?.stickies.push(
             stickies.value.find((sticky) => sticky.id === draggedStickyId)!
@@ -114,7 +123,7 @@ export default defineComponent({
       } else {
         stickies.value[draggedSticky].order = 1;
         stickies.value[droppedOnSticky].order = 2;
-        groupedStickies.push({
+        groupedStickies.value.push({
           id: uuid.v4(),
           stickies: [
             stickies.value[draggedSticky],
