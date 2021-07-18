@@ -24,13 +24,13 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     let positions = {
-      clientX: undefined,
-      clientY: undefined,
+      clientX: 0,
+      clientY: 0,
       movementX: 0,
       movementY: 0,
     };
     const draggableContainer = ref<HTMLElement>();
-    function dragMouseDown(event: any, id: string) {
+    function dragMouseDown(event: DragEvent) {
       event.preventDefault();
       // get the mouse cursor position at startup:
       positions.clientX = event.clientX;
@@ -58,8 +58,11 @@ export default defineComponent({
       document.onmousemove = null;
     }
     onMounted(() => {
-      const stickies = JSON.parse(localStorage.getItem(props.type)!);
-      const sticky = stickies.find((sticky: ISticky) => sticky.id === props.id);
+      const stickies =
+        JSON.parse(localStorage.getItem(props.type) as string) || [];
+      const sticky = stickies.find(
+        (sticky: ISticky) => sticky.id === props.id
+      ) || { top: "0px", left: "0px" };
       draggableContainer.value!.style.top = sticky.top;
       draggableContainer.value!.style.left = sticky.left;
     });
