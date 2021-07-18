@@ -40,17 +40,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import StickyForm from "@/components/StickyForm.vue";
 import invertColor from "@/composables/useInvertColor";
+import { ISticky } from "@/interfaces/ISticky";
 
 export default defineComponent({
   name: "Sticky",
   components: { StickyForm },
   props: {
-    sticky: {},
+    sticky: { type: Object as PropType<ISticky> },
     showForm: Boolean,
-    stickyId: {},
+    stickyId: String,
   },
   setup(_, { emit }) {
     function saveSticky({ id, text, color }: any) {

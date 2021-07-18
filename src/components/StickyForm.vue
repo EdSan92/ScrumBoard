@@ -35,9 +35,7 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "StickyForm",
   props: {
-    id: {
-      type: String,
-    },
+    id: String,
   },
   setup(_, { emit }) {
     const text = ref("");

@@ -78,9 +78,11 @@ export default defineComponent({
     } = reactive({ value: [] });
     let stickyId = ref();
     let showForm = ref();
+    // Whenever stickies array changes, update localstorage
     watch(stickies, () => {
       localStorage.setItem("stickies", JSON.stringify(stickies.value));
     });
+    // Whenever groupedStickies array changes, update localstorage
     watch(groupedStickies, () => {
       localStorage.setItem(
         "groupedStickies",
@@ -133,10 +135,12 @@ export default defineComponent({
     function drag(ev: DragEvent, id: string) {
       ev.dataTransfer!.setData("text", id);
     }
+    // Drop sticky on other sticky or group
     function drop({ ev, id }: { ev: DragEvent; id: string }) {
       ev.preventDefault();
       let draggedStickyId = ev.dataTransfer!.getData("text");
       let droppedOnStickyId = id;
+      // Makes sure you can't drop sticky on itself
       if (draggedStickyId === droppedOnStickyId) return;
       let draggedSticky = stickies.value.findIndex(
         (sticky) => sticky.id === draggedStickyId
@@ -144,9 +148,12 @@ export default defineComponent({
       let droppedOnSticky = stickies.value.findIndex(
         (sticky) => sticky.id === droppedOnStickyId
       );
-      if (groupedStickies.value.find((sticky) => sticky.id === id)) {
+      // If dropped on group, add to group, else cerate new group with both stickies
+      if (
+        groupedStickies.value.find((sticky) => sticky.id === droppedOnStickyId)
+      ) {
         groupedStickies.value
-          .find((sticky) => sticky.id === id)
+          .find((sticky) => sticky.id === droppedOnStickyId)
           ?.stickies.push(
             stickies.value.find((sticky) => sticky.id === draggedStickyId)!
           );
@@ -171,6 +178,7 @@ export default defineComponent({
         );
       }
     }
+    // Remove sticky from group
     function detachSticky({
       groupId,
       stickyId,
@@ -191,6 +199,7 @@ export default defineComponent({
             ?.stickies.findIndex((sticky) => sticky.id === stickyId) || 0,
           1
         );
+      // If last sticky is detached, remove group
       if (
         groupedStickies.value.find((group) => group.id === groupId)?.stickies
           .length === 0
@@ -201,6 +210,7 @@ export default defineComponent({
         );
       }
     }
+    // Save position for localstorage
     function savePosition({
       id,
       type,

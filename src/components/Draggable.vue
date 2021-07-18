@@ -19,7 +19,7 @@ import { defineComponent, onMounted, ref } from "vue";
 export default defineComponent({
   name: "Draggable",
   props: {
-    id: {},
+    id: { type: String },
     type: { type: String, required: true },
   },
   setup(props, { emit }) {
