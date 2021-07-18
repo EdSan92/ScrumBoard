@@ -37,18 +37,11 @@
                 <button>Move</button>
             </template>
             <template v-slot:main>
-                <div
-                    v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
-                    :key="i"
-                    @drop="drop($event, groupedSticky.id)"
-                    @dragover="allowDrop($event)"
-                    class="card sticky"
-                >
-                    {{ sticky.text }}
-                    <button @click="detachSticky(groupedSticky.id, sticky.id)">
-                        Detach
-                    </button>
-                </div>
+                <GroupedStickies
+                    :groupedSticky="groupedSticky"
+                    @detachSticky="detachSticky"
+                    @drop="drop"
+                />
             </template>
         </Draggable>
     </template>
@@ -58,16 +51,18 @@
 import { defineComponent, onMounted, reactive, ref, watch } from "vue";
 import { uuid } from "vue-uuid";
 import { ISticky } from "@/interfaces/ISticky";
+import { IGroupedSticky } from "@/interfaces/IGroupedSticky";
 import Sticky from "@/components/Sticky.vue";
 import Draggable from "@/components/Draggable.vue";
+import GroupedStickies from "@/components/GroupedStickies.vue";
 
 export default defineComponent({
   name: "Board",
-  components: { Sticky, Draggable },
+  components: { Sticky, Draggable, GroupedStickies },
   setup() {
     let stickies: { value: ISticky[] } = reactive({ value: [] });
     let groupedStickies: {
-      value: { id: string; top: string; left: string; stickies: ISticky[] }[];
+      value: IGroupedSticky[];
     } = reactive({ value: [] });
     let stickyId = ref();
     let showForm = ref();
@@ -126,7 +121,7 @@ export default defineComponent({
     function drag(ev: DragEvent, id: string) {
       ev.dataTransfer!.setData("text", id);
     }
-    function drop(ev: DragEvent, id: string) {
+    function drop({ ev, id }: { ev: DragEvent; id: string }) {
       ev.preventDefault();
       let draggedStickyId = ev.dataTransfer!.getData("text");
       let droppedOnStickyId = id;
@@ -164,10 +159,13 @@ export default defineComponent({
         );
       }
     }
-    function orderStickies(stickies: ISticky[]) {
-      return stickies.sort((a, b) => b.order - a.order);
-    }
-    function detachSticky(groupId: string, stickyId: string) {
+    function detachSticky({
+      groupId,
+      stickyId,
+    }: {
+      groupId: string;
+      stickyId: string;
+    }) {
       stickies.value.push(
         groupedStickies.value[
           groupedStickies.value.findIndex((group) => group.id === groupId)
@@ -223,7 +221,6 @@ export default defineComponent({
       drag,
       drop,
       groupedStickies,
-      orderStickies,
       detachSticky,
       savePosition,
     };
