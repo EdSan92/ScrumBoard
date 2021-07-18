@@ -3,6 +3,7 @@
         :style="`background-color: ${sticky.color}; color: ${invertColor(
             sticky.color
         )}`"
+        role="button"
     >
         <StickyForm
             v-show="showForm && sticky.id === stickyId"

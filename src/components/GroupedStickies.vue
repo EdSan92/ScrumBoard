@@ -16,7 +16,10 @@
             class="btn float-start"
             @click="detachSticky(groupedSticky.id, sticky.id)"
         >
-            <i class="bi bi-unlock"></i>
+            <i
+                class="bi bi-unlock"
+                :style="`color: ${invertColor(sticky.color)}`"
+            ></i>
         </button>
     </div>
 </template>
