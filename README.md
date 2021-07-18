@@ -1,5 +1,11 @@
 # scrum-board
 
+## Instructions
+1. Clone repository
+2. Run npm install in folder
+3. Run npm serve in folder
+4. Open browser and navigate to http://localhost:8080/
+
 ## Project setup
 ```
 npm install
