@@ -7,11 +7,16 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, onBeforeUpdate, ref } from "vue";
+import { ISticky } from "@/interfaces/ISticky";
+import { defineComponent, onMounted, ref } from "vue";
 
 export default defineComponent({
   name: "Draggable",
-  setup() {
+  props: {
+    id: {},
+    stickies: {},
+  },
+  setup(props, { emit }) {
     let positions = {
       clientX: undefined,
       clientY: undefined,
@@ -19,7 +24,7 @@ export default defineComponent({
       movementY: 0,
     };
     const draggableContainer = ref<HTMLElement>();
-    function dragMouseDown(event: any) {
+    function dragMouseDown(event: any, id: string) {
       event.preventDefault();
       // get the mouse cursor position at startup:
       positions.clientX = event.clientX;
@@ -34,15 +39,24 @@ export default defineComponent({
       positions.clientX = event.clientX;
       positions.clientY = event.clientY;
       // set the element's new position:
-      draggableContainer.value!.style.top =
+      let top =
         draggableContainer.value!.offsetTop - positions.movementY + "px";
-      draggableContainer.value!.style.left =
+      let left =
         draggableContainer.value!.offsetLeft - positions.movementX + "px";
+      draggableContainer.value!.style.top = top;
+      draggableContainer.value!.style.left = left;
+      emit("savePosition", { id: props.id, top, left });
     }
     function closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
     }
+    onMounted(() => {
+      const stickies = JSON.parse(localStorage.getItem("stickies")!);
+      const sticky = stickies.find((sticky: ISticky) => sticky.id === props.id);
+      draggableContainer.value!.style.top = sticky.top;
+      draggableContainer.value!.style.left = sticky.left;
+    });
     return {
       dragMouseDown,
       draggableContainer,

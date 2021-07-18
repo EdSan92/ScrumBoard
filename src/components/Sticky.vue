@@ -1,40 +1,32 @@
 <template>
-    <Draggable>
-        <template v-slot:header>
-            <button>Move</button>
-        </template>
-        <template v-slot:main>
-            <div
-                :style="`background-color: ${
-                    sticky.color
-                }; color: ${invertColor(sticky.color)}`"
-            >
-                <StickyForm
-                    v-show="showForm && sticky.id === stickyId"
-                    :id="sticky.id"
-                    @saveSticky="saveSticky"
-                />
+    <div
+        :style="`background-color: ${sticky.color}; color: ${invertColor(
+            sticky.color
+        )}`"
+    >
+        <StickyForm
+            v-show="showForm && sticky.id === stickyId"
+            :id="sticky.id"
+            @saveSticky="saveSticky"
+        />
 
-                <template v-if="!showForm || sticky.id !== stickyId">
-                    <p>
-                        {{ sticky.text }}
-                    </p>
-                    <button @click="updateSticky(sticky.id)">Update</button>
-                    <button @click="deleteSticky(sticky.id)">Delete</button>
-                </template>
-            </div>
+        <template v-if="!showForm || sticky.id !== stickyId">
+            <p>
+                {{ sticky.text }}
+            </p>
+            <button @click="updateSticky(sticky.id)">Update</button>
+            <button @click="deleteSticky(sticky.id)">Delete</button>
         </template>
-    </Draggable>
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import StickyForm from "@/components/StickyForm.vue";
-import Draggable from "@/components/Draggable.vue";
 
 export default defineComponent({
   name: "Sticky",
-  components: { StickyForm, Draggable },
+  components: { StickyForm },
   props: {
     sticky: {},
     showForm: Boolean,

@@ -1,19 +1,30 @@
 <template>
     <button @click="createSticky" :disabled="showForm">New sticky</button>
-    <Sticky
+    <Draggable
         v-for="(sticky, i) in stickies.value"
-        :sticky="sticky"
         :key="i"
-        :showForm="showForm"
-        :stickyId="stickyId"
-        draggable="true"
-        @drop="drop($event, sticky.id)"
-        @dragover="allowDrop($event)"
-        @dragstart="drag($event, sticky.id)"
-        @saveSticky="saveSticky"
-        @deleteSticky="deleteSticky"
-        @updateSticky="updateSticky"
-    />
+        :id="sticky.id"
+        :stickies="stickies.value"
+        @savePosition="savePosition"
+    >
+        <template v-slot:header>
+            <button>Move</button>
+        </template>
+        <template v-slot:main>
+            <Sticky
+                :sticky="sticky"
+                :showForm="showForm"
+                :stickyId="stickyId"
+                draggable="true"
+                @drop="drop($event, sticky.id)"
+                @dragover="allowDrop($event)"
+                @dragstart="drag($event, sticky.id)"
+                @saveSticky="saveSticky"
+                @deleteSticky="deleteSticky"
+                @updateSticky="updateSticky"
+            />
+        </template>
+    </Draggable>
     <Draggable v-if="groupedStickies.value.length > 0">
         <template v-slot:header>
             <button>Move</button>
@@ -73,7 +84,14 @@ export default defineComponent({
     });
     function createSticky() {
       const id = uuid.v4();
-      stickies.value.push({ id: id, text: "", color: "#FFFFFF", order: 0 });
+      stickies.value.push({
+        id: id,
+        text: "",
+        color: "#FFFFFF",
+        order: 0,
+        top: "",
+        left: "",
+      });
       stickyId.value = id;
       showForm.value = true;
     }
@@ -83,6 +101,8 @@ export default defineComponent({
         text,
         color,
         order: 0,
+        top: "",
+        left: "",
       };
       stickyId.value = null;
       showForm.value = false;
@@ -166,6 +186,22 @@ export default defineComponent({
         );
       }
     }
+    function savePosition({
+      id,
+      top,
+      left,
+    }: {
+      id: string;
+      top: string;
+      left: string;
+    }) {
+      stickies.value[
+        stickies.value.findIndex((sticky) => sticky.id === id)
+      ].top = top;
+      stickies.value[
+        stickies.value.findIndex((sticky) => sticky.id === id)
+      ].left = left;
+    }
     return {
       stickies,
       createSticky,
@@ -180,6 +216,7 @@ export default defineComponent({
       groupedStickies,
       orderStickies,
       detachSticky,
+      savePosition,
     };
   },
 });
