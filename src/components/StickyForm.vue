@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="onSubmit">
+    <form @submit.prevent="onSubmit" class="p-3">
         <div class="mb-3">
             <label for="text" class="form-label">Text</label>
             <input
@@ -20,7 +20,7 @@
             />
         </div>
         <button
-            class="btn btn-primary"
+            class="btn btn-primary text-center w-100"
             @click="saveSticky(id)"
             :disabled="text === ''"
         >

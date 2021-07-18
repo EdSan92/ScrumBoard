@@ -4,7 +4,7 @@
             <p class="text-white mb-0">Scrum Board</p>
             <button
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-secondary"
                 @click="createSticky"
                 :disabled="showForm"
             >
