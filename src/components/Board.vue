@@ -16,7 +16,7 @@
                 :showForm="showForm"
                 :stickyId="stickyId"
                 draggable="true"
-                @drop="drop($event, sticky.id)"
+                @drop="drop({ ev: $event, id: sticky.id })"
                 @dragover="allowDrop($event)"
                 @dragstart="drag($event, sticky.id)"
                 @saveSticky="saveSticky"
