@@ -1,10 +1,10 @@
 <template>
     <button @click="createSticky" :disabled="showForm">New sticky</button>
     <Draggable
-        v-for="(sticky, i) in stickies.value"
-        :key="i"
+        v-for="sticky in stickies.value"
+        :key="sticky.id"
         :id="sticky.id"
-        :stickies="stickies.value"
+        :type="'stickies'"
         @savePosition="savePosition"
     >
         <template v-slot:header>
@@ -25,16 +25,18 @@
             />
         </template>
     </Draggable>
-    <Draggable v-if="groupedStickies.value.length > 0">
-        <template v-slot:header>
-            <button>Move</button>
-        </template>
-        <template v-slot:main>
-            <div
-                v-for="(groupedSticky, i) in groupedStickies.value"
-                :key="i"
-                class="grouped"
-            >
+    <template v-if="groupedStickies.value.length > 0">
+        <Draggable
+            v-for="groupedSticky in groupedStickies.value"
+            :key="groupedSticky.id"
+            :id="groupedSticky.id"
+            :type="'groupedStickies'"
+            @savePosition="savePosition"
+        >
+            <template v-slot:header>
+                <button>Move</button>
+            </template>
+            <template v-slot:main>
                 <div
                     v-for="(sticky, i) in orderStickies(groupedSticky.stickies)"
                     :key="i"
@@ -47,9 +49,9 @@
                         Detach
                     </button>
                 </div>
-            </div>
-        </template>
-    </Draggable>
+            </template>
+        </Draggable>
+    </template>
 </template>
 
 <script lang="ts">
@@ -64,8 +66,9 @@ export default defineComponent({
   components: { Sticky, Draggable },
   setup() {
     let stickies: { value: ISticky[] } = reactive({ value: [] });
-    let groupedStickies: { value: { id: string; stickies: ISticky[] }[] } =
-      reactive({ value: [] });
+    let groupedStickies: {
+      value: { id: string; top: string; left: string; stickies: ISticky[] }[];
+    } = reactive({ value: [] });
     let stickyId = ref();
     let showForm = ref();
     watch(stickies, () => {
@@ -148,6 +151,8 @@ export default defineComponent({
         stickies.value[droppedOnSticky].order = 2;
         groupedStickies.value.push({
           id: uuid.v4(),
+          top: "",
+          left: "",
           stickies: [
             stickies.value[draggedSticky],
             stickies.value[droppedOnSticky],
@@ -188,18 +193,22 @@ export default defineComponent({
     }
     function savePosition({
       id,
+      type,
       top,
       left,
     }: {
       id: string;
+      type: string;
       top: string;
       left: string;
     }) {
-      stickies.value[
-        stickies.value.findIndex((sticky) => sticky.id === id)
+      let stickiesToSave =
+        type === "stickies" ? stickies.value : groupedStickies.value;
+      stickiesToSave[
+        stickiesToSave.findIndex((sticky: any) => sticky.id === id)
       ].top = top;
-      stickies.value[
-        stickies.value.findIndex((sticky) => sticky.id === id)
+      stickiesToSave[
+        stickiesToSave.findIndex((sticky: any) => sticky.id === id)
       ].left = left;
     }
     return {

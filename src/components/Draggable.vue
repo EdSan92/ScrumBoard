@@ -8,13 +8,13 @@
 </template>
 <script lang="ts">
 import { ISticky } from "@/interfaces/ISticky";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, PropType, ref } from "vue";
 
 export default defineComponent({
   name: "Draggable",
   props: {
     id: {},
-    stickies: {},
+    type: { type: String, required: true },
   },
   setup(props, { emit }) {
     let positions = {
@@ -45,14 +45,14 @@ export default defineComponent({
         draggableContainer.value!.offsetLeft - positions.movementX + "px";
       draggableContainer.value!.style.top = top;
       draggableContainer.value!.style.left = left;
-      emit("savePosition", { id: props.id, top, left });
+      emit("savePosition", { id: props.id, type: props.type, top, left });
     }
     function closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
     }
     onMounted(() => {
-      const stickies = JSON.parse(localStorage.getItem("stickies")!);
+      const stickies = JSON.parse(localStorage.getItem(props.type)!);
       const sticky = stickies.find((sticky: ISticky) => sticky.id === props.id);
       draggableContainer.value!.style.top = sticky.top;
       draggableContainer.value!.style.left = sticky.left;
