@@ -1,5 +1,17 @@
 <template>
-    <button @click="createSticky" :disabled="showForm">New sticky</button>
+    <nav class="navbar navbar-dark bg-success">
+        <div class="container-fluid">
+            <p class="text-white mb-0">Scrum Board</p>
+            <button
+                type="button"
+                class="btn btn-primary"
+                @click="createSticky"
+                :disabled="showForm"
+            >
+                New sticky
+            </button>
+        </div>
+    </nav>
     <Draggable
         v-for="sticky in stickies.value"
         :key="sticky.id"

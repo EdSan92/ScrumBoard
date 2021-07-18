@@ -11,11 +11,29 @@
         />
 
         <template v-if="!showForm || sticky.id !== stickyId">
-            <p>
+            <p class="text-center">
                 {{ sticky.text }}
             </p>
-            <button @click="updateSticky(sticky.id)">Update</button>
-            <button @click="deleteSticky(sticky.id)">Delete</button>
+            <button
+                type="button"
+                class="btn float-start"
+                @click="updateSticky(sticky.id)"
+                :style="`background-color: ${
+                    sticky.color
+                }; color: ${invertColor(sticky.color)}`"
+            >
+                <i class="bi bi-pencil-square"></i>
+            </button>
+            <button
+                type="button"
+                class="btn float-end"
+                @click="deleteSticky(sticky.id)"
+                :style="`background-color: ${
+                    sticky.color
+                }; color: ${invertColor(sticky.color)}`"
+            >
+                <i class="bi bi-trash"></i>
+            </button>
         </template>
     </div>
 </template>

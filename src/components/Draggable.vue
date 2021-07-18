@@ -1,7 +1,13 @@
 <template>
     <div ref="draggableContainer" id="draggable-container" class="card">
-        <div id="draggable-header" @mousedown="dragMouseDown">
-            <slot name="header"></slot>
+        <div>
+            <button
+                type="button"
+                class="btn btn-light w-100"
+                @mousedown="dragMouseDown"
+            >
+                <i class="bi bi-arrows-move"></i>
+            </button>
         </div>
         <slot name="main"></slot>
     </div>
@@ -67,6 +73,10 @@ export default defineComponent({
 <style>
 #draggable-container {
     position: absolute;
-    z-index: 9;
+    top: 54px;
+    right: 12px;
+}
+.card {
+    width: 150px;
 }
 </style>
